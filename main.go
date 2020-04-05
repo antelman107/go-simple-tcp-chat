@@ -18,7 +18,7 @@ func main() {
 		panic(err)
 	}
 
-	l, err := net.Listen("tcp", ":9090")
+	l, err := net.Listen("tcp", "localhost:9090")
 	if err != nil {
 		return
 	}
@@ -26,7 +26,7 @@ func main() {
 	defer l.Close()
 
 	// Using sync.Map to not deal with concurrency slice/map issues
-	var connMap = sync.Map{}
+	var connMap = &sync.Map{}
 
 	for {
 		conn, err := l.Accept()
@@ -42,7 +42,7 @@ func main() {
 	}
 }
 
-func handleUserConnection(id string, c net.Conn, connMap sync.Map, logger *zap.Logger) {
+func handleUserConnection(id string, c net.Conn, connMap *sync.Map, logger *zap.Logger) {
 	defer func() {
 		c.Close()
 		connMap.Delete(id)
